@@ -122,7 +122,8 @@ jobs:
       - name: Check if initial release
         if:  needs.get-versions.outputs.LATEST_TAG == ''        
         run: |
-          echo "MANUAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}.0-rc.0" | tee -a "$GITHUB_STEP_SUMMARY" | tee -a "$GITHUB_ENV"
+          echo "INITIAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}.0-rc.0" | tee -a "$GITHUB_STEP_SUMMARY" | tee -a "$GITHUB_ENV"
+          echo "MANUAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}.0-rc.0" | tee -a "$GITHUB_ENV"
       - name: Set semver info
         id: set-semver-info
         if:  needs.get-versions.outputs.LATEST_TAG != ''        
@@ -131,9 +132,11 @@ jobs:
           current_version: ${{ needs.get-versions.outputs.LATEST_TAG}}
           level: ${{ needs.get-versions.outputs.INC_LEVEL}}
           preID: rc
-      - name: Show next version
-        id: show-next-ver
+      - name: Show next sem-version
+        if:  needs.get-versions.outputs.LATEST_TAG != ''        
         run: |
+          echo "MANUAL_VERSION=${{ steps.set-semver-info.outputs.new_version }}" > "$GITHUB_ENV"
+      - run: |
           echo "Next version: ${{ env.MANUAL_VERSION }}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Create new release
         id: create_release
@@ -150,7 +153,7 @@ jobs:
           draft: false
           prerelease: ${{ needs.get-versions.outputs.IS_PRE_RELEASE == 'True' }}
           prerelease_suffix: rc
-          tag_name: ${{ steps.set-semver-info.outputs.new_version }}
+          tag_name: ${{ env.MANUAL_VERSION }}
           auto_increment_type: ${{ (env.IS_PRE_RELEASE == 'True') && 'prerelease' || 'patch' }}
           tag_schema: semantic
           
