@@ -142,7 +142,7 @@ jobs:
           MANUAL_VERSION: "${{ env.MANUAL_VERSION }}"
         with:
           repo-token: ${{ secrets.SDK_SYNC_PAT }}
-          release_name: ${{ steps.set-semver-info.outputs.new_version }}
+          release_name: ${{ env.MANUAL_VERSION }}
           body: |
             [Changelog](/./CHANGELOG.md) 
             [Readme](/./README.md) 
