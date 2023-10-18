@@ -8,7 +8,7 @@
 
 ## Create release branch 
 * ~~Create a release-1.0 branch and pr~~
-* Add to pr commits
+* ~~Add to pr commits~~
 * Merge the pr
 * Exp: pre and release build
 
