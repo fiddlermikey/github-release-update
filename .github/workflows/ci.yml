@@ -118,23 +118,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "INC_LEVEL = ${{ needs.get-versions.outputs.INC_LEVEL}}"
+          echo "INC_LEVEL=${{ needs.get-versions.outputs.INC_LEVEL}}"
+      - name: Check if initial release
+        if:  needs.get-versions.outputs.LATEST_TAG == ''        
+        run: |
+          echo "MANUAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}-rc.0" | tee -a "$GITHUB_STEP_SUMMARY" | tee -a "$GITHUB_ENV"
       - name: Set semver info
-        uses: fiddlermikey/action-bump-semver@main
         id: set-semver-info
+        if:  needs.get-versions.outputs.LATEST_TAG != ''        
+        uses: fiddlermikey/action-bump-semver@main
         with:
           current_version: ${{ needs.get-versions.outputs.LATEST_TAG}}
           level: ${{ needs.get-versions.outputs.INC_LEVEL}}
           preID: rc
-      - name: Show semver next
-        id: show-next-semver
+      - name: Show next version
+        id: show-next-ver
         run: |
-          echo "next: ${{ steps.set-semver-info.outputs.new_version }}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Next version: ${{ env.MANUAL_VERSION }}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Create new release
         id: create_release
         uses: fiddlermikey/action-create-release@pre
         env:
-          MANUAL_VERSION: "${{ steps.set-semver-info.outputs.new_version }}"
+          MANUAL_VERSION: "${{ env.MANUAL_VERSION }}"
         with:
           repo-token: ${{ secrets.SDK_SYNC_PAT }}
           release_name: ${{ steps.set-semver-info.outputs.new_version }}
