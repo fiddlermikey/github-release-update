@@ -1,13 +1,12 @@
 # Replace github-release workflow
 
 
-## Update main first
-* Create change to ci.yml in main
-* Exp: no release build
-
+~~## Update main first~~
+* ~~Create change to ci.yml in main~~
+* ~~Exp: no release build~~
 
 ## Create release branch 
-* Create a release-1.0 branch and pr
+* Create a ~~release-1.0 branch~~ and pr
 * Merge the pr
 * Exp: pre and release build
 
