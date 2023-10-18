@@ -6,7 +6,8 @@
 * ~~Exp: no release build~~
 
 ## Create release branch 
-* Create a ~~release-1.0 branch~~ and pr
+* Create a ~~release-1.0 branch~~  : no build ran
+* Create PR
 * Merge the pr
 * Exp: pre and release build
 
