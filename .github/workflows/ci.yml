@@ -61,12 +61,12 @@ jobs:
           latestTag=`git fetch --tags && git tag --sort=v:refname | grep "${{ env.PR_BASE_TAG }}\." | head -n 1`
           echo "LATEST_TAG=$latestTag"  | tee -a "$GITHUB_OUTPUT"
           if [[ $latestTag != latestReleaseTag ]]; then
-						echo "IS_HOTFIX=True" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
-          	echo "LATEST_TAG=$latestReleaseTag"  | tee -a "$GITHUB_OUTPUT";
-					else
-						echo "IS_HOTFIX=False" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
-          	echo "LATEST_TAG=$latestTag"  | tee -a "$GITHUB_OUTPUT";
-					fi
+            echo "IS_HOTFIX=True" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
+            echo "LATEST_TAG=$latestReleaseTag"  | tee -a "$GITHUB_OUTPUT";
+          else
+            echo "IS_HOTFIX=False" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
+            echo "LATEST_TAG=$latestTag"  | tee -a "$GITHUB_OUTPUT";
+          fi
 
       - name: Display PR_BASE_REF
         if: github.event_name == 'pull_request'
