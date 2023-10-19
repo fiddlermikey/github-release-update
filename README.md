@@ -19,6 +19,7 @@
 
 ## Merge release branch to main
 * ~~Create a patch commit and pr in release-1.0 (not latest)~~
+* ~~Add additional commits~~
 * Merge the pr
 * Exp: pre/release builds
 
