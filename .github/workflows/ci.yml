@@ -1,6 +1,14 @@
 name: My Release Replacer Workflow
 
 on:
+  workflow_call:
+    outputs:
+      release_version:
+        description: The computed release version for the release (or pre-release) being built
+        value: ${{ jobs.create-github-release.outputs.release_version }}
+      release_url:
+        description: The upload URL for build artifacts for this release
+        value: ${{ jobs.create-github-release.outputs.release_url }}
   pull_request:
     types:
       - opened
