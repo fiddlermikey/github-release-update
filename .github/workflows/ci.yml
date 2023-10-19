@@ -95,11 +95,6 @@ jobs:
         run: |
           echo "Just run a build on sha ${{ github.sha }} with no delivery/release artifacts"
 
-# Before calling this a release or prerelease build DO WE still need to check the state of pulls that match the ${{ env.PR_BASE_REF }}?
-# We need to find the latest tag that matches the ${{ env.PR_BASE_REF }}
-# To do this, we need to strip the 'release-' from the ref and find the latest repo.tag
-# Finding base tag name above as ${{ env.PR_BASE_TAG }}
-
       - name: Create Prerelease Candidate Build
         if: needs.get-versions.outputs.IS_PRE_RELEASE == 'True'
         id: prerelease-build
@@ -122,7 +117,8 @@ jobs:
       - name: Check if initial release
         if:  needs.get-versions.outputs.LATEST_TAG == ''        
         run: |
-          echo "MANUAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}-rc.0" | tee -a "$GITHUB_STEP_SUMMARY" | tee -a "$GITHUB_ENV"
+          echo "INITIAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}.0-rc.0" | tee -a "$GITHUB_STEP_SUMMARY" | tee -a "$GITHUB_ENV"
+          echo "MANUAL_VERSION=${{needs.get-versions.outputs.PR_BASE_TAG}}.0-rc.0" | tee -a "$GITHUB_ENV"
       - name: Set semver info
         id: set-semver-info
         if:  needs.get-versions.outputs.LATEST_TAG != ''        
@@ -131,18 +127,21 @@ jobs:
           current_version: ${{ needs.get-versions.outputs.LATEST_TAG}}
           level: ${{ needs.get-versions.outputs.INC_LEVEL}}
           preID: rc
-      - name: Show next version
-        id: show-next-ver
+      - name: Show next sem-version
+        if:  needs.get-versions.outputs.LATEST_TAG != ''        
         run: |
+          echo "MANUAL_VERSION=${{ steps.set-semver-info.outputs.new_version }}" > "$GITHUB_ENV"
+      - run: |
           echo "Next version: ${{ env.MANUAL_VERSION }}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Create new release
         id: create_release
-        uses: fiddlermikey/action-create-release@pre
+        uses: keyfactor/action-create-release@v3
         env:
           MANUAL_VERSION: "${{ env.MANUAL_VERSION }}"
+          GITHUB_TOKEN: "${{ secrets.SDK_SYNC_PAT }}"
         with:
-          repo-token: ${{ secrets.SDK_SYNC_PAT }}
-          release_name: ${{ steps.set-semver-info.outputs.new_version }}
+          # repo-token: ${{ secrets.SDK_SYNC_PAT }} # This will work with my updated version in fiddlermikey/action-create-release
+          release_name: ${{ env.MANUAL_VERSION }}
           body: |
             [Changelog](/./CHANGELOG.md) 
             [Readme](/./README.md) 
@@ -150,7 +149,7 @@ jobs:
           draft: false
           prerelease: ${{ needs.get-versions.outputs.IS_PRE_RELEASE == 'True' }}
           prerelease_suffix: rc
-          tag_name: ${{ steps.set-semver-info.outputs.new_version }}
+          tag_name: ${{ env.MANUAL_VERSION }}
           auto_increment_type: ${{ (env.IS_PRE_RELEASE == 'True') && 'prerelease' || 'patch' }}
           tag_schema: semantic
           
