@@ -13,9 +13,9 @@
 * Exp: pre and release build: Confirmed
 
 ## Merge release branch to main
-* Create a release-1.0 branch and pr
-* Merge the pr
-* Exp: no release build
+* ~~Create a release-1.0 branch and pr~~
+* ~~Merge the pr~~
+* Exp: no release build: Confirmed
 
 ## Create minorrelease branch 
 * ~~Create a release-1.1 branch and pr~~
