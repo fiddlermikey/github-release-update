@@ -13,9 +13,15 @@
 * Exp: pre and release build
 
 ## Merge release branch to main
-* Create a release-1.0 branch and pr
-* Merge the pr
+* ~~Create a release-1.0 branch and pr~~
+* ~~Merge the pr~~
 * Exp: no release build
+
+## Merge release branch to main
+* ~~Create a patch commit and pr in release-1.0 (not latest)~~
+* ~~Add additional commits~~
+* Merge the pr
+* Exp: pre/release builds
 
 ## Create non release branch 
 * Create a dev branch, dev2 branch and pr from dev2 -> dev
