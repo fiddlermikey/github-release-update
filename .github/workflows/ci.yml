@@ -138,8 +138,9 @@ jobs:
         uses: keyfactor/action-create-release@v3
         env:
           MANUAL_VERSION: "${{ env.MANUAL_VERSION }}"
+          GITHUB_TOKEN: "${{ secrets.SDK_SYNC_PAT }}"
         with:
-          repo-token: ${{ secrets.SDK_SYNC_PAT }}
+          # repo-token: ${{ secrets.SDK_SYNC_PAT }} # This will work with my updated version in fiddlermikey/action-create-release
           release_name: ${{ env.MANUAL_VERSION }}
           body: |
             [Changelog](/./CHANGELOG.md) 
