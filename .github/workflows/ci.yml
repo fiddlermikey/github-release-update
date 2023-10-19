@@ -57,15 +57,42 @@ jobs:
         if: github.event_name == 'pull_request'
         id: find-latest-tag
         run: |
-          latestReleaseTag=`git fetch --tags && git tag --sort=v:refname | head -n 1`
-          latestTag=`git fetch --tags && git tag --sort=v:refname | grep "${{ env.PR_BASE_TAG }}\." | head -n 1`
-          echo "LATEST_TAG=$latestTag"  | tee -a "$GITHUB_OUTPUT"
-          if [[ $latestTag != latestReleaseTag ]]; then
+          prbasetag=${{ env.PR_BASE_TAG }}
+          git fetch --tags
+          # First get the latest release tag. If a version has an rc, check for the full release without the rc
+          # Get all the tags, sorted reverse
+          allTags=$(git tag --sort=-v:refname)
+          # Get all the tags that match the prbasetag (defined above)
+          allBranchTags=$(git tag --sort=-v:refname | grep "$prbasetag\.")
+          # These are the raw (non -rc*) tag name for semver. 
+          branchTagBase=$(echo "${allBranchTags[@]}" | grep -o '^[0-9.]*' | head -n 1)
+          latestTagBase=$(echo "${allTags[@]}" | grep -o '^[0-9.]*' | head -n 1)
+          # If the *TagBase values are not found in the list of tags it means no final release was produced and the latest*Tag vars will be empty. Use the latest prerelease tag if the main tag is empty. This will always exist for a hotfix
+          latestBranchTag=$(printf "%s\n" "${allTags[@]}" | grep "^$branchTagBase$" | head -n 1)
+          latestPreBranchTag=$(printf "%s\n" "${allTags[@]}" | grep "^$branchTagBase-rc" | head -n 1)
+          latestReleasedTag=$(printf "%s\n" "${allTags[@]}" | grep "^$latestTagBase$" | head -n 1)
+          latestPreReleasedTag=$(printf "%s\n" "${allTags[@]}" | grep "^$latestTagBase-rc" | head -n 1)
+
+          # TODO: Remove Debugging Output
+          echo "latestBranchTag is $latestBranchTag" | tee -a $GITHUB_STEP_SUMMARY;
+          echo "latestReleasedTag is $latestReleasedTag" | tee -a $GITHUB_STEP_SUMMARY;
+          echo "latestPreBranchTag is $latestPreBranchTag" | tee -a $GITHUB_STEP_SUMMARY;
+          echo "latestPreReleasedTag is $latestPreReleasedTag" | tee -a $GITHUB_STEP_SUMMARY;
+          echo "branchTagBase is $branchTagBase" | tee -a $GITHUB_STEP_SUMMARY;
+          echo "latestTagBase is $latestTagBase" | tee -a $GITHUB_STEP_SUMMARY;
+
+          if [[ $branchTagBase != $latestTagBase ]]; then
             echo "IS_HOTFIX=True" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
-            echo "LATEST_TAG=$latestReleaseTag"  | tee -a "$GITHUB_OUTPUT";
+            if [[ "$latestBranchTag" == "" ]]; then
+              echo "LATEST_TAG=$latestPreBranchTag" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
+            fi
           else
             echo "IS_HOTFIX=False" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
-            echo "LATEST_TAG=$latestTag"  | tee -a "$GITHUB_OUTPUT";
+            if [[ "$latestReleasedTag" != "" ]]; then
+              echo "LATEST_TAG=$latestReleasedTag" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
+            else
+              echo "LATEST_TAG=$latestPreReleasedTag" | tee -a "$GITHUB_OUTPUT" | tee -a $GITHUB_STEP_SUMMARY;
+            fi
           fi
 
       - name: Display PR_BASE_REF
