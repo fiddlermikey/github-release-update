@@ -135,7 +135,7 @@ jobs:
           echo "Next version: ${{ env.MANUAL_VERSION }}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Create new release
         id: create_release
-        uses: keyfactor/action-create-release@v3
+        uses: fiddlermikey/action-create-release@pre
         env:
           MANUAL_VERSION: "${{ env.MANUAL_VERSION }}"
           GITHUB_TOKEN: "${{ secrets.SDK_SYNC_PAT }}"
