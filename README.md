@@ -20,8 +20,8 @@
 ## Create minorrelease branch 
 * ~~Create a release-1.1 branch and pr~~
 * ~~Add to pr commits~~
-* Merge the pr
-* Exp: pre and release build: Confirmed
+* ~~Merge the pr~~
+* Exp: pre and release build: 
 
 ## Merge release branch to main
 * Create a release-1.0 branch and pr
