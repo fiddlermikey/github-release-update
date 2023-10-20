@@ -145,19 +145,18 @@ jobs:
         id: create_release
         uses: keyfactor/action-create-release@v3
         env:
-          MANUAL_VERSION: "${{ env.MANUAL_VERSION }}"
-          GITHUB_TOKEN: "${{ secrets.SDK_SYNC_PAT }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MANUAL_VERSION: ${{ env.MANUAL_VERSION }}
         with:
-          # repo-token: ${{ secrets.SDK_SYNC_PAT }} # This will work with my updated version in fiddlermikey/action-create-release
           release_name: ${{ env.MANUAL_VERSION }}
           body: |
             [Changelog](/./CHANGELOG.md) 
             [Readme](/./README.md) 
             For the latest README.md updates visit the [Main Page](/../main) for this repository
           draft: false
-          prerelease: ${{ needs.get-versions.outputs.IS_PRE_RELEASE == 'True' }}
+          prerelease: ${{ env.IS_PRE_RELEASE == 'True' }}
           prerelease_suffix: rc
           tag_name: ${{ env.MANUAL_VERSION }}
           auto_increment_type: ${{ (env.IS_PRE_RELEASE == 'True') && 'prerelease' || 'patch' }}
           tag_schema: semantic
-          
+          commitish: ${{ github.sha }}
